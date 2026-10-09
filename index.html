@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="RotaExpress: cadastro de encomendas, cálculo de frete e endereço preenchido pelo CEP (API ViaCEP).">
+  <title>RotaExpress · Gestão de Encomendas e Frete</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23ff5a1f'/%3E%3Cpath d='M10 29c7 0 6-17 13-17h5' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M25 7.5l5 4.5-5 4.5' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/script.js" defer></script>
+</head>
+<body>
+  <header class="topo">
+    <div class="topo__conteudo">
+      <div class="marca">
+        <svg class="marca__icone" viewBox="0 0 40 40" aria-hidden="true">
+          <rect width="40" height="40" rx="10" fill="#ff5a1f" />
+          <path d="M10 29c7 0 6-17 13-17h5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" />
+          <path d="M25 7.5l5 4.5-5 4.5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="10" cy="29" r="3.2" fill="#fff" />
+        </svg>
+        <h1 class="marca__nome">Rota<span>Express</span></h1>
+      </div>
+      <p class="topo__descricao">Triagem, despacho e precificação de encomendas</p>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <!-- Contadores atualizados pelo JavaScript a cada cadastro, mudança de status ou exclusão -->
+    <section class="painel" aria-labelledby="titulo-painel">
+      <h2 id="titulo-painel" class="painel__titulo">Visão geral</h2>
+      <dl class="indicadores">
+        <div class="indicador">
+          <dt>Encomendas</dt>
+          <dd id="indicador-total">0</dd>
+        </div>
+        <div class="indicador indicador--pendente">
+          <dt>Pendentes</dt>
+          <dd id="indicador-pendentes">0</dd>
+        </div>
+        <div class="indicador indicador--transito">
+          <dt>Em trânsito</dt>
+          <dd id="indicador-transito">0</dd>
+        </div>
+        <div class="indicador indicador--entregue">
+          <dt>Entregues</dt>
+          <dd id="indicador-entregues">0</dd>
+        </div>
+        <div class="indicador indicador--faturamento">
+          <dt>Faturamento acumulado</dt>
+          <dd id="indicador-faturamento">R$ 0,00</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="cadastro" aria-labelledby="titulo-cadastro">
+      <h2 id="titulo-cadastro" class="secao__titulo">Nova encomenda</h2>
+
+      <form id="form-encomenda" class="formulario">
+        <fieldset class="formulario__grupo">
+          <legend class="formulario__legenda"><span class="formulario__passo">1</span> Destinatário e pacote</legend>
+          <div class="grade">
+            <div class="campo">
+              <label for="destinatario">Nome do destinatário</label>
+              <input type="text" id="destinatario" name="destinatario" placeholder="Ex.: Ana Beatriz Souza" required minlength="3" maxlength="80">
+            </div>
+            <div class="campo">
+              <label for="peso">Peso (kg)</label>
+              <input type="number" id="peso" name="peso" placeholder="Ex.: 2,5" required min="0.1" max="30" step="0.01">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="formulario__grupo">
+          <legend class="formulario__legenda"><span class="formulario__passo">2</span> Modalidade de envio</legend>
+          <!-- Prazo e fator espelham a tabela Encomenda.MODALIDADES (js/script.js) -->
+          <div class="modalidades">
+            <input type="radio" id="modalidade-economica" name="modalidade" value="economica" required>
+            <label for="modalidade-economica" class="modalidade modalidade--economica">
+              <span class="modalidade__nome">Econômica</span>
+              <span class="modalidade__prazo">7 a 10 dias úteis</span>
+              <span class="modalidade__fator">×1,0</span>
+            </label>
+
+            <input type="radio" id="modalidade-padrao" name="modalidade" value="padrao" required checked>
+            <label for="modalidade-padrao" class="modalidade modalidade--padrao">
+              <span class="modalidade__nome">Padrão</span>
+              <span class="modalidade__prazo">3 a 5 dias úteis</span>
+              <span class="modalidade__fator">×1,4</span>
+            </label>
+
+            <input type="radio" id="modalidade-expressa" name="modalidade" value="expressa" required>
+            <label for="modalidade-expressa" class="modalidade modalidade--expressa">
+              <span class="modalidade__nome">Expressa</span>
+              <span class="modalidade__prazo">1 a 2 dias úteis</span>
+              <span class="modalidade__fator">×2,0</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="formulario__grupo">
+          <legend class="formulario__legenda"><span class="formulario__passo">3</span> Endereço de entrega</legend>
+          <div class="grade">
+            <div class="campo">
+              <label for="cep">CEP</label>
+              <div class="campo__linha">
+                <input type="text" id="cep" name="cep" placeholder="00000-000" required pattern="\d{5}-?\d{3}" maxlength="9" inputmode="numeric" title="Digite os 8 números do CEP. Ex.: 70790-075">
+                <button type="button" id="botao-buscar-cep" class="botao botao--secundario">Buscar</button>
+              </div>
+              <p id="mensagem-cep" class="mensagem-cep" role="status">Digite o CEP e clique em Buscar: o endereço vem da ViaCEP.</p>
+            </div>
+            <div class="campo campo--largo">
+              <label for="logradouro">Logradouro</label>
+              <input type="text" id="logradouro" name="logradouro" placeholder="Preenchido pelo CEP" required>
+            </div>
+            <div class="campo campo--curto">
+              <label for="numero">Número</label>
+              <input type="text" id="numero" name="numero" placeholder="Ex.: 120" required maxlength="10">
+            </div>
+            <div class="campo">
+              <label for="bairro">Bairro</label>
+              <input type="text" id="bairro" name="bairro" placeholder="Preenchido pelo CEP" required>
+            </div>
+            <div class="campo campo--largo">
+              <label for="cidade">Cidade</label>
+              <input type="text" id="cidade" name="cidade" placeholder="Preenchida pelo CEP" readonly>
+            </div>
+            <div class="campo campo--curto">
+              <label for="uf">UF</label>
+              <input type="text" id="uf" name="uf" placeholder="—" readonly>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="previa">
+          <p>Frete estimado <output id="previa-frete" for="peso modalidade-economica modalidade-padrao modalidade-expressa">R$ —</output></p>
+          <p>Prazo <strong id="previa-prazo">—</strong></p>
+        </div>
+
+        <button type="submit" class="botao botao--destaque">Cadastrar encomenda</button>
+      </form>
+    </section>
+
+    <!-- Cada card é um <article> criado pelo JavaScript -->
+    <section class="encomendas" aria-labelledby="titulo-encomendas">
+      <h2 id="titulo-encomendas" class="secao__titulo">Encomendas</h2>
+      <p id="estado-vazio" class="vazio">Nenhuma encomenda cadastrada. Use o formulário para registrar a primeira.</p>
+      <div id="lista-encomendas" class="lista"></div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="rodape__conteudo">
+      <p><strong>RotaExpress</strong> · Projeto 01 — Desenvolvimento Web · CEUB · 2º/2026</p>
+      <p>Desenvolvido por Marco Antônio Marques Monte · Endereços via <a href="https://viacep.com.br/" target="_blank" rel="noopener noreferrer">ViaCEP</a></p>
+    </div>
+  </footer>
+
+  <!-- Avisos temporários: o JavaScript cria e remove cada um -->
+  <div id="avisos" class="avisos" role="status" aria-live="polite"></div>
+</body>
+</html>

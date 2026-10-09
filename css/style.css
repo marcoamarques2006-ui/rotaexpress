@@ -1,0 +1,836 @@
+/* ==========================================================================
+   RotaExpress — Folha de estilos (CSS3 puro, sem frameworks)
+   Layout com CSS Grid e Flexbox. Media queries no fim do arquivo:
+   smartphones (até 480px), tablets (481px a 768px) e desktops (769px ou mais).
+
+   1. Variáveis   2. Base   3. Cabeçalho   4. Layout   5. Painel
+   6. Formulário  7. Botões 8. Cards       9. Avisos e rodapé
+   10. Animações  11. Responsividade
+   ========================================================================== */
+
+/* 1. Variáveis ------------------------------------------------------------ */
+:root {
+  --cor-fundo: #f4f2ed;
+  --cor-superficie: #ffffff;
+  --cor-tinta: #141a26;
+  --cor-texto: #2c3240;
+  --cor-texto-suave: #5f6676;
+  --cor-borda: #e4e0d6;
+  --cor-borda-forte: #cbc5b7;
+  --cor-marca: #ff5a1f;
+  --cor-acao: #d63f0b;
+  --cor-foco: #1f6feb;
+  --cor-pendente: #b26a00;
+  --cor-transito: #6a4bd1;
+  --cor-entregue: #1e7d43;
+  --cor-erro: #c42b2b;
+  --raio: 14px;
+  --raio-pequeno: 9px;
+  --sombra: 0 1px 2px rgb(20 26 38 / 0.06), 0 10px 28px -14px rgb(20 26 38 / 0.22);
+  --fonte-mono: ui-monospace, Consolas, 'Courier New', monospace;
+}
+
+/* 2. Base ----------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  line-height: 1.5;
+  color: var(--cor-texto);
+  background-color: var(--cor-fundo);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  color: var(--cor-tinta);
+}
+
+input,
+button {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* O atributo hidden precisa vencer o display definido pelas classes */
+[hidden] {
+  display: none !important;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cor-foco);
+  outline-offset: 2px;
+}
+
+/* 3. Cabeçalho ------------------------------------------------------------ */
+.topo {
+  background-color: var(--cor-tinta);
+  border-bottom: 4px solid var(--cor-marca);
+}
+
+/* Cabeçalho, conteúdo e rodapé usam a mesma largura máxima, centralizada */
+.topo__conteudo,
+.conteudo,
+.rodape__conteudo {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 1.5rem;
+}
+
+.topo__conteudo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-block: 1rem;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.marca__icone {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.marca__nome {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.marca__nome span {
+  color: var(--cor-marca);
+}
+
+.topo__descricao {
+  font-size: 0.9rem;
+  color: rgb(255 255 255 / 0.72);
+}
+
+/* 4. Layout principal (Grid) ---------------------------------------------- */
+.conteudo {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'painel'
+    'cadastro'
+    'encomendas';
+  align-items: start;
+  gap: 1.5rem;
+}
+
+.secao__titulo {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+/* 5. Painel de indicadores ------------------------------------------------ */
+.painel {
+  grid-area: painel;
+}
+
+.painel__titulo {
+  margin-bottom: 0.75rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.indicador {
+  padding: 0.9rem 1rem;
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+
+.indicador dt {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cor-texto-suave);
+}
+
+/* Bolinha com a cor de cada contador */
+.indicador dt::before {
+  content: '';
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background-color: var(--cor-indicador, var(--cor-tinta));
+}
+
+.indicador dd {
+  margin-top: 0.35rem;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--cor-tinta);
+}
+
+.indicador--pendente {
+  --cor-indicador: var(--cor-pendente);
+}
+
+.indicador--transito {
+  --cor-indicador: var(--cor-transito);
+}
+
+.indicador--entregue {
+  --cor-indicador: var(--cor-entregue);
+}
+
+/* Faturamento em destaque: cartão escuro (linha inteira no celular) */
+.indicador--faturamento {
+  --cor-indicador: var(--cor-marca);
+  grid-column: 1 / -1;
+  background-color: var(--cor-tinta);
+}
+
+.indicador--faturamento dt {
+  color: rgb(255 255 255 / 0.72);
+}
+
+.indicador--faturamento dd {
+  color: #fff;
+}
+
+/* 6. Formulário ----------------------------------------------------------- */
+.cadastro {
+  grid-area: cadastro;
+  padding: 1.5rem;
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formulario__grupo {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.formulario__legenda {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+}
+
+.formulario__passo {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  color: #fff;
+  background-color: var(--cor-tinta);
+}
+
+/* Grade de 6 colunas: por padrão cada campo ocupa a linha inteira */
+.grade {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.9rem 0.75rem;
+}
+
+.campo {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.campo--largo {
+  grid-column: span 4;
+}
+
+.campo--curto {
+  grid-column: span 2;
+}
+
+.campo label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cor-tinta);
+}
+
+.campo input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.8rem;
+  border: 1.5px solid var(--cor-borda-forte);
+  border-radius: var(--raio-pequeno);
+}
+
+.campo input:focus {
+  border-color: var(--cor-tinta);
+}
+
+.campo input[readonly] {
+  background-color: var(--cor-fundo);
+  border-style: dashed;
+}
+
+/* Borda de erro só depois que o usuário mexe no campo ou tenta enviar */
+.campo input:user-invalid {
+  border-color: var(--cor-erro);
+}
+
+.campo__linha {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.campo__linha input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Mensagem da consulta de CEP: a cor muda conforme o data-estado */
+.mensagem-cep {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  color: var(--cor-texto-suave);
+}
+
+/* Indicador de carregamento (spinner) enquanto a ViaCEP responde */
+.mensagem-cep[data-estado='carregando']::before {
+  content: '';
+  flex-shrink: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--cor-borda-forte);
+  border-top-color: var(--cor-tinta);
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+.mensagem-cep[data-estado='sucesso'] {
+  color: var(--cor-entregue);
+}
+
+.mensagem-cep[data-estado='erro'] {
+  font-weight: 600;
+  color: var(--cor-erro);
+}
+
+/* Modalidades: o rádio fica invisível (mas funciona pelo teclado) e o label vira um cartão */
+.modalidades {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.modalidades input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modalidade {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 0.9rem 0.8rem;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1.5px solid var(--cor-borda-forte);
+  border-radius: var(--raio-pequeno);
+}
+
+/* Faixa no topo com a cor da modalidade (cores definidas na seção 8) */
+.modalidade::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(--cor-modalidade);
+}
+
+.modalidade__nome {
+  flex: 1;
+  font-weight: 800;
+  color: var(--cor-tinta);
+}
+
+.modalidade__prazo {
+  font-size: 0.75rem;
+  color: var(--cor-texto-suave);
+}
+
+.modalidade__fator {
+  font-family: var(--fonte-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--cor-modalidade);
+}
+
+.modalidades input:checked + .modalidade {
+  background-color: var(--cor-modalidade-fundo);
+  border-color: var(--cor-modalidade);
+  box-shadow: inset 0 0 0 1px var(--cor-modalidade);
+}
+
+.modalidades input:focus-visible + .modalidade {
+  outline: 3px solid var(--cor-foco);
+  outline-offset: 2px;
+}
+
+/* Prévia do frete, com cara de canhoto de recibo */
+.previa {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  font-size: 0.8rem;
+  color: var(--cor-texto-suave);
+  border: 1.5px dashed var(--cor-borda-forte);
+  border-radius: var(--raio-pequeno);
+}
+
+.previa output,
+.previa strong {
+  display: block;
+  color: var(--cor-tinta);
+}
+
+.previa output {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.previa p:last-child {
+  text-align: right;
+}
+
+/* 7. Botões --------------------------------------------------------------- */
+.botao {
+  min-height: 2.6rem;
+  padding: 0.55rem 1rem;
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  border-radius: var(--raio-pequeno);
+}
+
+.botao:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.botao:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.botao--primario {
+  color: #fff;
+  background-color: var(--cor-tinta);
+}
+
+.botao--destaque {
+  min-height: 3rem;
+  color: #fff;
+  background-color: var(--cor-acao);
+}
+
+.botao--secundario {
+  color: var(--cor-tinta);
+  background-color: var(--cor-superficie);
+  border-color: var(--cor-tinta);
+}
+
+.botao--fantasma {
+  color: var(--cor-texto-suave);
+  background-color: transparent;
+}
+
+.botao--fantasma:hover {
+  color: var(--cor-erro);
+}
+
+/* 8. Lista e cards -------------------------------------------------------- */
+.encomendas {
+  grid-area: encomendas;
+  min-width: 0;
+}
+
+.lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: 1rem;
+}
+
+.vazio {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--cor-texto-suave);
+  border: 2px dashed var(--cor-borda-forte);
+  border-radius: var(--raio);
+}
+
+.card {
+  --cor-andamento: var(--cor-tinta);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.35rem 1.15rem 1rem;
+  overflow: hidden;
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  animation: entrar 0.35s ease-out;
+}
+
+/* Faixa no topo com a cor da modalidade */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: var(--cor-modalidade);
+}
+
+.card__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card__modalidade {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cor-modalidade);
+  background-color: var(--cor-modalidade-fundo);
+  border-radius: 999px;
+}
+
+.card__codigo {
+  font-family: var(--fonte-mono);
+  font-size: 0.8rem;
+  color: var(--cor-texto-suave);
+}
+
+.card__destinatario {
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.card__endereco {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+}
+
+/* Não deixa o CEP quebrar no hífen */
+.card__cep {
+  white-space: nowrap;
+}
+
+.card__dados {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding-block: 0.75rem;
+  border-block: 1px dashed var(--cor-borda-forte);
+}
+
+.card__dados dt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+}
+
+.card__dados dd {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--cor-tinta);
+}
+
+/* Linha do tempo do status: bolinhas (::before) ligadas por trilhos (::after) */
+.rastreio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0;
+  list-style: none;
+}
+
+.rastreio__etapa {
+  position: relative;
+  padding-top: 1.35rem;
+  font-size: 0.72rem;
+  text-align: center;
+  color: var(--cor-texto-suave);
+}
+
+.rastreio__etapa::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(50% - 0.45rem);
+  z-index: 1;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--cor-borda-forte);
+  border-radius: 50%;
+  background-color: var(--cor-superficie);
+}
+
+.rastreio__etapa:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 0.4rem;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background-color: var(--cor-borda-forte);
+}
+
+.rastreio__etapa.is-concluida::before {
+  background-color: var(--cor-andamento);
+  border-color: var(--cor-andamento);
+}
+
+.rastreio__etapa.is-concluida:not(.is-atual)::after {
+  background-color: var(--cor-andamento);
+}
+
+.rastreio__etapa.is-atual {
+  font-weight: 700;
+  color: var(--cor-tinta);
+}
+
+.card__acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.card__acoes .botao--primario {
+  flex: 1;
+}
+
+/* Carimbo "Entregue": aparece no lugar do botão quando a encomenda é entregue */
+.card__carimbo {
+  display: none;
+  margin-right: auto;
+  padding: 0.15rem 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cor-entregue);
+  border: 3px double var(--cor-entregue);
+  border-radius: 6px;
+  transform: rotate(-6deg);
+}
+
+.card--entregue {
+  --cor-andamento: var(--cor-entregue);
+}
+
+.card--entregue .card__carimbo {
+  display: inline-block;
+}
+
+/* Cores por modalidade: valem para as opções do formulário e para os cards */
+.modalidade--economica,
+.card--economica {
+  --cor-modalidade: #0b6e63;
+  --cor-modalidade-fundo: #e1f3f0;
+}
+
+.modalidade--padrao,
+.card--padrao {
+  --cor-modalidade: #2853c7;
+  --cor-modalidade-fundo: #e7edfb;
+}
+
+.modalidade--expressa,
+.card--expressa {
+  --cor-modalidade: #c2410c;
+  --cor-modalidade-fundo: #ffefe5;
+}
+
+/* Expressa ganha faixa listrada, como fita de "urgente" */
+.modalidade--expressa::before,
+.card--expressa::before {
+  background: repeating-linear-gradient(-45deg, var(--cor-marca) 0 10px, var(--cor-tinta) 10px 20px);
+}
+
+/* 9. Avisos e rodapé ------------------------------------------------------ */
+.avisos {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 22rem;
+}
+
+.aviso {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: #fff;
+  background-color: var(--cor-tinta);
+  border-left: 4px solid #3ccf7f;
+  border-radius: var(--raio-pequeno);
+  animation: entrar 0.25s ease-out;
+}
+
+.aviso--erro {
+  border-left-color: #ff6b6b;
+}
+
+.rodape {
+  background-color: var(--cor-superficie);
+  border-top: 1px solid var(--cor-borda);
+}
+
+.rodape__conteudo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem 1.5rem;
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+}
+
+.rodape a {
+  font-weight: 600;
+  color: var(--cor-tinta);
+}
+
+/* 10. Animações ----------------------------------------------------------- */
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Respeita quem prefere menos movimento na tela */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before {
+    animation: none !important;
+  }
+}
+
+/* 11. Responsividade ------------------------------------------------------ */
+
+/* Smartphones — até 480px */
+@media (max-width: 480px) {
+  .topo__conteudo,
+  .conteudo,
+  .rodape__conteudo {
+    padding-inline: 1rem;
+  }
+
+  .marca__nome {
+    font-size: 1.3rem;
+  }
+
+  .cadastro {
+    padding: 1.1rem;
+  }
+
+  .indicador dd {
+    font-size: 1.5rem;
+  }
+
+  .avisos {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+}
+
+/* Tablets — de 481px a 768px */
+@media (min-width: 481px) and (max-width: 768px) {
+  .indicadores {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Desktops — a partir de 769px: formulário à esquerda, lista à direita */
+@media (min-width: 769px) {
+  .conteudo {
+    grid-template-columns: minmax(330px, 380px) minmax(0, 1fr);
+    grid-template-areas:
+      'painel painel'
+      'cadastro encomendas';
+    padding-block: 2rem 3rem;
+  }
+
+  .indicadores {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.5fr);
+  }
+
+  .indicador--faturamento {
+    grid-column: auto;
+  }
+}
